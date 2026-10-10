@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- dotnet publish produces one .exe (uses the installed .NET runtime) -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <DebugType>embedded</DebugType>
+    <!-- Icon of the .exe (Explorer, Start menu) -->
+    <ApplicationIcon>AppsMenu.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Same icon for the window's title bar and taskbar button (MainForm loads it) -->
+    <EmbeddedResource Include="AppsMenu.ico" LogicalName="AppsMenu.ico" />
+  </ItemGroup>
+
+</Project>
