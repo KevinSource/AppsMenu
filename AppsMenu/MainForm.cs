@@ -1,5 +1,7 @@
+using Microsoft.Win32;
 using System.Diagnostics;
 using System.Text.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AppsMenu;
 
@@ -84,13 +86,13 @@ public partial class MainForm : Form
 
     private void Launch(ToolEntry tool, bool optionChecked)
     {
-        string path = Environment.ExpandEnvironmentVariables(tool.Path);
         string args = string.Join(" ", new[] { tool.Arguments, optionChecked ? tool.OptionArguments : null }
-            .Where(a => !string.IsNullOrWhiteSpace(a)));
+        .Where(a => !string.IsNullOrWhiteSpace(a)));
         try
         {
-            if (!File.Exists(path))
-                throw new FileNotFoundException($"File not found:\n{path}");
+            string path = ToolResolver.Resolve(tool.Path)
+            ?? throw new FileNotFoundException(
+                $"Not found as a file, on PATH, or in App Paths:\n{Environment.ExpandEnvironmentVariables(tool.Path)}");
 
             // Shell execute runs .exe, .bat and .cmd the way a double-click would, in their own window
             Process.Start(new ProcessStartInfo(path, args)

@@ -136,8 +136,7 @@ public partial class SettingsForm : Form
                 return;
             }
         }
-
-        var missing = _tools.Where(t => !File.Exists(Environment.ExpandEnvironmentVariables(t.Path))).ToList();
+        var missing = _tools.Where(t => ToolResolver.Resolve(t.Path) == null).ToList();
         if (missing.Count > 0)
         {
             string list = string.Join("\n", missing.Select(t => $"  {t.Name}: {t.Path}"));
