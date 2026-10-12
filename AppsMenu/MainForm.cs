@@ -82,23 +82,31 @@ public partial class MainForm : Form
             }
         }
         toolsPanel.ResumeLayout();
-        FitHeightToTools();
+        FitSizeToTools();
     }
 
     /// <summary>
-    /// Sizes the window's height to the buttons, growing or shrinking it, but no taller than the screen
-    /// (past that the panel scrolls) and no shorter than MinimumSize.
+    /// Sizes the window to the buttons, growing or shrinking it, but no bigger than the screen
+    /// (past that the panel scrolls) and no smaller than MinimumSize.
     /// </summary>
-    private void FitHeightToTools()
+    private void FitSizeToTools()
     {
-        int needed = toolsPanel.GetPreferredSize(new Size(toolsPanel.ClientSize.Width, 0)).Height;
-        int extra = needed - toolsPanel.ClientSize.Height;
-        if (extra == 0)
-            return;
-
+        var needed = toolsPanel.GetPreferredSize(Size.Empty);
         var workingArea = Screen.FromControl(this).WorkingArea;
-        Height = Math.Min(Height + extra, workingArea.Height);
-        // Keep the bottom edge on screen
+        // Everything around the panel: borders, title bar and menu
+        int chromeWidth = Width - toolsPanel.Width;
+        int chromeHeight = Height - toolsPanel.Height;
+
+        // A scrollbar in one direction takes room from the other, so allow for it when the screen caps a side
+        bool scrollsDown = chromeHeight + needed.Height > workingArea.Height;
+        int fullWidth = chromeWidth + needed.Width + (scrollsDown ? SystemInformation.VerticalScrollBarWidth : 0);
+        bool scrollsAcross = fullWidth > workingArea.Width;
+        int fullHeight = chromeHeight + needed.Height + (scrollsAcross ? SystemInformation.HorizontalScrollBarHeight : 0);
+
+        Size = new Size(Math.Min(fullWidth, workingArea.Width), Math.Min(fullHeight, workingArea.Height));
+        // Keep the right and bottom edges on screen
+        if (Right > workingArea.Right)
+            Left = Math.Max(workingArea.Left, workingArea.Right - Width);
         if (Bottom > workingArea.Bottom)
             Top = Math.Max(workingArea.Top, workingArea.Bottom - Height);
     }
