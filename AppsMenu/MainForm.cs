@@ -82,6 +82,25 @@ public partial class MainForm : Form
             }
         }
         toolsPanel.ResumeLayout();
+        FitHeightToTools();
+    }
+
+    /// <summary>
+    /// Sizes the window's height to the buttons, growing or shrinking it, but no taller than the screen
+    /// (past that the panel scrolls) and no shorter than MinimumSize.
+    /// </summary>
+    private void FitHeightToTools()
+    {
+        int needed = toolsPanel.GetPreferredSize(new Size(toolsPanel.ClientSize.Width, 0)).Height;
+        int extra = needed - toolsPanel.ClientSize.Height;
+        if (extra == 0)
+            return;
+
+        var workingArea = Screen.FromControl(this).WorkingArea;
+        Height = Math.Min(Height + extra, workingArea.Height);
+        // Keep the bottom edge on screen
+        if (Bottom > workingArea.Bottom)
+            Top = Math.Max(workingArea.Top, workingArea.Bottom - Height);
     }
 
     private void Launch(ToolEntry tool, bool optionChecked)
