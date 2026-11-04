@@ -34,11 +34,15 @@ dotnet publish AppsMenu\AppsMenu.csproj -c Release -r win-x64 -o "C:\Tools\AppsM
 
 Then add it to the Start menu by creating a shortcut to `AppsMenu.exe` in `%APPDATA%\Microsoft\Windows\Start Menu\Programs`. Right-click it in **All apps** to pin it to Start or the taskbar.
 
-Publishing again later replaces only `AppsMenu.exe`; your tool list is kept.
+Publishing again later replaces only `AppsMenu.exe`; your tool list is kept (it's stored separately, see below).
 
 ## Configuring tools
 
-Use **Settings > Edit tools**. The list is saved as `tools.json` next to `AppsMenu.exe`, so you can also edit it by hand and use **Settings > Reload tools.json**:
+Use **Settings > Edit tools**. The list is saved as `tools.json` in `%LOCALAPPDATA%\AppsMenu`, so you can also edit it by hand and use **Settings > Reload tools.json** (**Settings > Show tools.json in Explorer** opens that folder).
+
+Each computer keeps its own list, so one `AppsMenu.exe` can be shared, for example from a Google Drive folder, while each computer points at its own paths. A `tools.json` placed next to `AppsMenu.exe` is a starting list: the first time a computer runs the menu, it's copied to that computer's `%LOCALAPPDATA%\AppsMenu`. After that, only the local copy is used.
+
+Example:
 
 ```json
 {

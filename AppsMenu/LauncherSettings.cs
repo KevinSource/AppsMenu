@@ -34,12 +34,18 @@ public sealed class ToolEntry
 }
 
 /// <summary>
-/// Reads and writes tools.json next to the .exe. The file is never part of the build output,
-/// so publishing a new version never overwrites the tools you have set up.
+/// Reads and writes tools.json in %LOCALAPPDATA%\AppsMenu, so each computer keeps its own list even when
+/// AppsMenu.exe itself is shared (e.g. on Google Drive). A tools.json next to the .exe is only a starting list:
+/// it is copied to the local file the first time a computer runs the menu.
+/// Neither file is part of the build output, so publishing a new version never overwrites the tools you have set up.
 /// </summary>
 public static class SettingsStore
 {
-    public static string FilePath => Path.Combine(AppContext.BaseDirectory, "tools.json");
+    public static string FilePath => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AppsMenu", "tools.json");
+
+    /// <summary>The shared starting list beside the .exe, copied to FilePath when that doesn't exist yet.</summary>
+    public static string SeedPath => Path.Combine(AppContext.BaseDirectory, "tools.json");
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -50,7 +56,8 @@ public static class SettingsStore
     };
 
     /// <summary>
-    /// Loads tools.json; with no file yet, starts with an empty list (tools are added in Edit tools).
+    /// Loads the local tools.json, first copying the starting list beside the .exe if there's no local file yet.
+    /// With neither file, starts with an empty list (tools are added in Edit tools).
     /// Throws on unreadable or invalid JSON.
     /// </summary>
     /// <remarks>
@@ -59,10 +66,18 @@ public static class SettingsStore
     public static LauncherSettings Load()
     {
         if (!File.Exists(FilePath))
-            return new LauncherSettings();
+        {
+            if (!File.Exists(SeedPath))
+                return new LauncherSettings();
+            Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+            File.Copy(SeedPath, FilePath);
+        }
         return JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(FilePath), Options) ?? new LauncherSettings();
     }
 
-    public static void Save(LauncherSettings settings) =>
+    public static void Save(LauncherSettings settings)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
         File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options));
+    }
 }
