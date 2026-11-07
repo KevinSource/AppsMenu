@@ -13,6 +13,9 @@ public partial class MainForm : Form
 {
     private LauncherSettings _settings = new();
 
+    /// <summary>Major.Minor.Patch from &lt;Version&gt; in the csproj.</summary>
+    public static string AppVersion => typeof(MainForm).Assembly.GetName().Version?.ToString(3) ?? "";
+
     public MainForm()
     {
         InitializeComponent();
@@ -35,7 +38,10 @@ public partial class MainForm : Form
                             "Apps Menu", MessageBoxButtons.OK, MessageBoxIcon.Error);
             _settings = new LauncherSettings();
         }
-        Text = string.IsNullOrWhiteSpace(_settings.Title) ? "Apps Menu" : _settings.Title;
+        Text = (string.IsNullOrWhiteSpace(_settings.Title) ? "Apps Menu" : _settings.Title) + $"  v{AppVersion}";
+#if DEBUG
+        Text += " (Debug)";
+#endif
         BuildButtons();
     }
 

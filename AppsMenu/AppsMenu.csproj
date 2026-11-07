@@ -12,6 +12,8 @@
     <DebugType>embedded</DebugType>
     <!-- Icon of the .exe (Explorer, Start menu) -->
     <ApplicationIcon>AppsMenu.ico</ApplicationIcon>
+    <!-- Major.Minor.Patch. Shown in the title bar -->
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
